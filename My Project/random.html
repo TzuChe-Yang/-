@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成隨機測試資料</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 10px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>生成隨機測試資料</h1>
+    
+    <!-- 按鈕生成測試資料 -->
+    <button onclick="generateTestData()">生成測試資料</button><br><br>
+
+    <!-- 顯示生成的測試資料 -->
+    <textarea id="testData" rows="15" cols="80" readonly></textarea><br><br>
+
+    <script>
+        function generateTestData() {
+            const names = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Hank', 'Ivy', 'Jack',
+                            'Kathy', 'Liam', 'Mona', 'Nate', 'Olivia', 'Paul', 'Quincy', 'Rachel', 'Steve', 'Tina',
+                            'Ursula', 'Victor', 'Wendy', 'Xander', 'Yvonne', 'Zack', 'Anna', 'Ben', 'Cathy', 'Daniel',
+                            'Ella', 'Floyd', 'Gina', 'Hugo', 'Isla', 'Jake', 'Kara', 'Leo', 'Mia', 'Nina',
+                            'Oscar', 'Penny', 'Quinn', 'Rita', 'Sam', 'Uma', 'Vera', 'Will', 'Xena', 'Yara'];
+                            
+            const shifts = ['一B', '一C', '一D', '一X', '一E', '一F', '一G', '一H', '一Y', '一I', '一J',
+                            '二B', '二C', '二D', '二X', '二E', '二F', '二G', '二H', '二Y', '二I', '二J',
+                            '三B', '三C', '三D', '三X', '三E', '三F', '三G', '三H', '三Y', '三I', '三J',
+                            '四B', '四C', '四D', '四X', '四E', '四F', '四G', '四H', '四Y', '四I', '四J',
+                            '五B', '五C', '五D', '五X', '五E', '五F', '五G', '五H', '五Y', '五I', '五J'];
+
+            let data = '';
+
+            // 逐一遍歷每個人
+            for (let i = 0; i < names.length; i++) {
+                const name = names[i]; // 取得當前人的名稱
+                const Choices = []; // 存放志願
+                
+                // 隨機選擇 2 到 6 個不重複的時段作為志願
+                while (Choices.length < Math.floor(Math.random() * 5) + 2) {
+                    const shift = shifts[Math.floor(Math.random() * shifts.length)];
+                    if (!Choices.includes(shift)) {
+                        Choices.push(shift);
+                    }
+                }
+
+                // 拼接每個人的名稱及其志願
+                data += `${name}\t ${Choices.join('\t')}\n`;
+            }
+            // 去除最後一行的換行符
+            data = data.trimEnd();
+
+            // 顯示生成的測試資料
+            document.getElementById('testData').value = data;
+        }
+        
+    </script>
+</body>
+</html>

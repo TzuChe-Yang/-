@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班網站</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 10px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>排班網站</h1>
+
+    <!-- Textarea for data input -->
+    <textarea id="inputData" rows="10" cols="70" placeholder="在此貼上您的資料..."></textarea><br><br>
+
+    <!-- Button to trigger scheduling -->
+    <button onclick="fillSchedule()">填入排班表</button>
+
+    <!-- Predefined Schedule Table -->
+    <h2>排班表：</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>星期/時間</th>
+                <th>一</th>
+                <th>二</th>
+                <th>三</th>
+                <th>四</th>
+                <th>五</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>B 0900→1000</td>
+                <td id="B_Mon"></td>
+                <td id="B_Tue"></td>
+                <td id="B_Wed"></td>
+                <td id="B_Thu"></td>
+                <td id="B_Fri"></td>
+            </tr>
+            <tr>
+                <td>C 1000→1100</td>
+                <td id="C_Mon"></td>
+                <td id="C_Tue"></td>
+                <td id="C_Wed"></td>
+                <td id="C_Thu"></td>
+                <td id="C_Fri"></td>
+            </tr>
+            <tr>
+                <td>D 1100→1210</td>
+                <td id="D_Mon"></td>
+                <td id="D_Tue"></td>
+                <td id="D_Wed"></td>
+                <td id="D_Thu"></td>
+                <td id="D_Fri"></td>
+            </tr>
+            <tr>
+                <td>X 1210→1310</td>
+                <td id="X_Mon"></td>
+                <td id="X_Tue"></td>
+                <td id="X_Wed"></td>
+                <td id="X_Thu"></td>
+                <td id="X_Fri"></td>
+            </tr>
+            <tr>
+                <td>E 1310→1420</td>
+                <td id="E_Mon"></td>
+                <td id="E_Tue"></td>
+                <td id="E_Wed"></td>
+                <td id="E_Thu"></td>
+                <td id="E_Fri"></td>
+            </tr>
+            <tr>
+                <td>F 1420→1520</td>
+                <td id="F_Mon"></td>
+                <td id="F_Tue"></td>
+                <td id="F_Wed"></td>
+                <td id="F_Thu"></td>
+                <td id="F_Fri"></td>
+            </tr>
+            <tr>
+                <td>G 1520→1620</td>
+                <td id="G_Mon"></td>
+                <td id="G_Tue"></td>
+                <td id="G_Wed"></td>
+                <td id="G_Thu"></td>
+                <td id="G_Fri"></td>
+            </tr>
+            <tr>
+                <td>H 1620→1720</td>
+                <td id="H_Mon"></td>
+                <td id="H_Tue"></td>
+                <td id="H_Wed"></td>
+                <td id="H_Thu"></td>
+                <td id="H_Fri"></td>
+            </tr>
+            <tr>
+                <td>Y 1720→1830</td>
+                <td id="Y_Mon"></td>
+                <td id="Y_Tue"></td>
+                <td id="Y_Wed"></td>
+                <td id="Y_Thu"></td>
+                <td id="Y_Fri"></td>
+            </tr>
+            <tr>
+                <td>I 1830→1930</td>
+                <td id="I_Mon"></td>
+                <td id="I_Tue"></td>
+                <td id="I_Wed"></td>
+                <td id="I_Thu"></td>
+                <td id="I_Fri"></td>
+            </tr>
+            <tr>
+                <td>J 1930→2030</td>
+                <td id="J_Mon"></td>
+                <td id="J_Tue"></td>
+                <td id="J_Wed"></td>
+                <td id="J_Thu"></td>
+                <td id="J_Fri"></td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>每個人的排班時段：</h2>
+    <table id="personScheduleTable">
+        <thead>
+            <tr>
+                <th>姓名</th>
+                <th>排班時段</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 資料將由 JavaScript 動態插入 -->
+        </tbody>
+    </table>
+    
+    <script src="index.js"></script>
+</body>
+</html>
