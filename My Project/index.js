@@ -12,22 +12,24 @@ const mapping = {
     "一J": "J_Mon", "二J": "J_Tue", "三J": "J_Wed", "四J": "J_Thu", "五J": "J_Fri"
 };
 
-// 初始化所有時段的使用者清單
-const initializeSchedule = () => {
-    for (let id in mapping) {
-        const cell = document.getElementById(mapping[id]);
-        cell.textContent = ""; // 清空單元格內容
-    }
-};
-
 function fillSchedule() {
     // 取得 textarea 中的資料
     const inputData = document.getElementById('inputData').value;
     const lines = inputData.split('\n');
-    
+
     const personSchedule = {}; // 儲存每個人的排班
     const personShiftCount = {}; // 儲存每個人已分配的班次數量
     const assignedShifts = {}; // 儲存每個班次的分配人員
+
+    // 預先初始化所有班次為空數組
+    for (let shift in mapping) {
+        assignedShifts[shift] = [];
+        // 清空每個班次顯示的內容
+        const cell = document.getElementById(mapping[shift]);
+        if (cell) {
+            cell.textContent = '';
+        }
+    }
 
     // 初始排班
     lines.forEach(line => {
@@ -41,88 +43,62 @@ function fillSchedule() {
         // 排班，最多分配3個班次
         for (let i = 1; i < parts.length && personShiftCount[name] < 3; i++) {
             const shift = parts[i];
-            const cellId = mapping[shift];
-            if (cellId) {
-                const cell = document.getElementById(cellId);
-                // 確保每個班次至少有一名人員
-                if (!assignedShifts[shift]) {
-                    assignedShifts[shift] = [];
-                }
-
-                if (assignedShifts[shift].length === 0 || personShiftCount[name] < 3) {
-                    if (cell.textContent) {
-                        cell.textContent += ", " + name;
-                    } else {
-                        cell.textContent = name;
-                    }
-                    personSchedule[name].push(shift);
-                    personShiftCount[name]++;
-                    assignedShifts[shift].push(name);
-                }
-            }
+            personSchedule[name].push(shift);
+            personShiftCount[name]++;
+            assignedShifts[shift].push(name);
         }
     });
 
-    // 檢查空缺並進行調整
-    const shifts = Object.keys(mapping);
-    shifts.forEach(shift => {
-        // 如果班次沒有分配人員，則進行補充
-        if (!assignedShifts[shift] || assignedShifts[shift].length === 0) {
-            let assigned = false;
-
-            // 優先從人數最多的班次中找人
-            Object.keys(assignedShifts).forEach(otherShift => {
-                if (assignedShifts[otherShift] && assignedShifts[otherShift].length > 0) {
-                    assignedShifts[otherShift].forEach(person => {
-                        if (!assigned && personShiftCount[person] < 3) {
-                            // 確保該人選可以接受該班次
-                            if (lines.some(line => line.includes(person) && line.includes(shift))) {
-                                const cellId = mapping[shift];
-                                const cell = document.getElementById(cellId);
-                                if (cell.textContent) {
-                                    cell.textContent += ", " + person;
-                                } else {
-                                    cell.textContent = person;
-                                }
-                                personSchedule[person].push(shift);
-                                personShiftCount[person]++;
-                                assignedShifts[shift] = [person];
-                                assigned = true;
-                            }
+    for (let shift in assignedShifts) {
+        const shiftPeople = assignedShifts[shift].length;
+        if (shiftPeople === 0) {
+            const emptyShift = shift;
+            const availablePeople = findAvailablePeopleForShift(emptyShift, inputData);
+            console.log("無人時段:", emptyShift, "的可用人員:", availablePeople);
+    
+            let personMoved = false;
+    
+            availablePeople.forEach(person => {
+                if (personMoved) return;
+    
+                console.log(person, "的值班時段:", personSchedule[person]);
+    
+                for (let currentShift of personSchedule[person]) {
+                    console.log(currentShift, "的值班人數:", assignedShifts[currentShift].length);
+                    if (assignedShifts[currentShift].length > 1) {
+                        // 確保 `currentShift` 和 `emptyShift` 在 `assignedShifts` 和 `personSchedule` 中存在
+                        if (personSchedule[person].includes(currentShift)) {
+                            // 移除該人員的當前時段
+                            personSchedule[person] = personSchedule[person].filter(s => s !== currentShift);
+                            assignedShifts[currentShift] = assignedShifts[currentShift].filter(p => p !== person);
+    
+                            // 更新該人員的時段安排，並將其添加到無人時段
+                            personSchedule[person].push(emptyShift);
+                            assignedShifts[emptyShift].push(person);
+    
+                            console.log("將", person, "從", currentShift, "轉移到", emptyShift);
+                            console.log(person,"的值班時段:",personSchedule[person]);
+                            console.log(emptyShift, "的值班人員:", assignedShifts[emptyShift]);
+    
+                            // 設置標誌為已經成功轉移，並跳出內部循環
+                            personMoved = true;
+                            break;
                         }
-                    });
+                    }
                 }
             });
-
-            // 如果還是沒有人，則隨機選擇一個可以接受的人
-            if (!assigned) {
-                const availablePeople = Object.keys(personSchedule).filter(person => personShiftCount[person] < 3);
-                if (availablePeople.length > 0) {
-                    const person = availablePeople[Math.floor(Math.random() * availablePeople.length)];
-                    const cellId = mapping[shift];
-                    const cell = document.getElementById(cellId);
-                    if (cell.textContent) {
-                        cell.textContent += ", " + person;
-                    } else {
-                        cell.textContent = person;
-                    }
-                    personSchedule[person].push(shift);
-                    personShiftCount[person]++;
-                    assignedShifts[shift] = [person];
-                }
-            }
         }
-    });
+    }
 
-    // 最後確保每個人恰好有 3 個班次
-    Object.keys(personSchedule).forEach(person => {
-        while (personShiftCount[person] > 3) {
-            // 調整班次使每人只有 3 班
-            const shiftToRemove = personSchedule[person].pop();
-            assignedShifts[shiftToRemove] = assignedShifts[shiftToRemove].filter(p => p !== person);
-            personShiftCount[person]--;
+    // 更新班次顯示
+    for (let shift in assignedShifts) {
+        const cell = document.getElementById(mapping[shift]);
+        if (cell) {
+            cell.textContent = assignedShifts[shift].join(", ");
         }
-    });
+    }
+
+    
 
     // 獲取 personScheduleTable 的 tbody 元素
     const personScheduleTableBody = document.getElementById('personScheduleTable').querySelector('tbody');
@@ -143,4 +119,21 @@ function fillSchedule() {
         row.appendChild(scheduleCell);
         personScheduleTableBody.appendChild(row);
     }
+}
+
+function findAvailablePeopleForShift(shift, inputData) {
+    const lines = inputData.split('\n');
+    const availablePeople = [];
+
+    lines.forEach(line => {
+        const parts = line.trim().split(/\s+/);
+        const name = parts[0];
+        const shifts = parts.slice(1);
+
+        if (shifts.includes(shift)) {
+            availablePeople.push(name);
+        }
+    });
+
+    return availablePeople;
 }
